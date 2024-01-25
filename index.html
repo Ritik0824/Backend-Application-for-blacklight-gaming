@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard</title>
+  <style>
+    /* Your CSS styles here */
+  </style>
+</head>
+<body>
+  <h1>Leaderboard</h1>
+
+  <h2>Current Week Leaderboard</h2>
+  <ul id="currentWeekLeaderboard"></ul>
+
+  <h2>Last Week Leaderboard (Country: <span id="country">Country Code</span>)</h2>
+  <ul id="lastWeekLeaderboard"></ul>
+
+  <h2>User Rank</h2>
+  <p>Enter User ID: <input type="text" id="userIdInput"><button onclick="getUserRank()">Get Rank</button></p>
+  <p id="userRank"></p>
+
+  <script>
+    // Your JavaScript code here
+    async function fetchData(url) {
+      const response = await fetch(url);
+      return response.json();
+    }
+
+    async function displayCurrentWeekLeaderboard() {
+      const url = 'http://localhost:3000/leaderboard/current-week';
+      const data = await fetchData(url);
+
+      const leaderboardElement = document.getElementById('currentWeekLeaderboard');
+      leaderboardElement.innerHTML = '';
+
+      data.forEach(user => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${user.Name} (Score: ${user.Score}, Country: ${user.Country})`;
+        leaderboardElement.appendChild(listItem);
+      });
+    }
+
+    async function displayLastWeekLeaderboard(country) {
+      const url = `http://localhost:3000/leaderboard/last-week/${country}`;
+      const data = await fetchData(url);
+
+      const leaderboardElement = document.getElementById('lastWeekLeaderboard');
+      leaderboardElement.innerHTML = '';
+
+      data.forEach(user => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${user.Name} (Score: ${user.Score}, Country: ${user.Country})`;
+        leaderboardElement.appendChild(listItem);
+      });
+    }
+
+    async function getUserRank() {
+      const userId = document.getElementById('userIdInput').value;
+      const url = `http://localhost:3000/user-rank/${userId}`;
+      const data = await fetchData(url);
+
+      const userRankElement = document.getElementById('userRank');
+      userRankElement.textContent = `User Rank: ${data.rank}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      displayCurrentWeekLeaderboard();
+      displayLastWeekLeaderboard('US'); // Replace 'US' with the desired country code
+    });
+  </script>
+</body>
+</html>
